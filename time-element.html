@@ -1,0 +1,58 @@
+<script src="moment.js.min"></script>
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+Example:
+
+    <time-element></time-element>
+
+@group Cloudstitch
+@element time-element
+@demo demo/index.html
+-->
+<dom-module id="time-element">
+  <style>
+    :host {
+      display: inline-block;
+      box-sizing: border-box;
+    }
+  </style>
+  <template>
+    <div id="displayTime">{{outputstr}}</div>
+  </template>  
+  <script>
+    (function () {  
+      Polymer({
+        is: 'time-element',
+        properties: {
+          /**
+           * The Cloudstitch username.
+           */
+          timestr: {
+            type: String,
+            value: null
+          },
+
+          format: {
+            type: String,
+            value: "fromNow"
+          },
+
+          outputstr: {
+            type: String,
+            computed: 'makeTime(timestr, format)'
+          }
+        },
+        makeTime: function(timestr) {
+          console.log(this.format);
+          if (this.format == 'fromNow') {
+            return moment(timestr).fromNow();
+          } else {
+            return moment(timestr).format(this.format);
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

@@ -1,0 +1,514 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="./time-element.html">
+<link rel="import" href="../cloudstitch-box/cloudstitch-box.html">
+<link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
+<link rel="import" href="../iron-a11y-keys-behavior/iron-a11y-keys-behavior.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-autogrow-textarea/iron-autogrow-textarea.html">
+<link rel="import" href="../iron-checked-element-behavior/iron-checked-element-behavior.html">
+<link rel="import" href="../iron-collapse/iron-collapse.html">
+<link rel="import" href="../iron-component-page/iron-component-page.html">
+<link rel="import" href="../iron-doc-viewer/iron-doc-viewer.html">
+<link rel="import" href="../iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../iron-fit-behavior/iron-fit-behavior.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-form/iron-form.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="../iron-iconset-svg/iron-iconset-svg.html">
+<link rel="import" href="../iron-image/iron-image.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
+<link rel="import" href="../iron-menu-behavior/iron-menu-behavior.html">
+<link rel="import" href="../iron-meta/iron-meta.html">
+<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../iron-range-behavior/iron-range-behavior.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-signals/iron-signals.html">
+<link rel="import" href="../iron-validatable-behavior/iron-validatable-behavior.html">
+<link rel="import" href="../paper-badge/paper-badge.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../paper-fab/paper-fab.html">
+<link rel="import" href="../paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-menu/paper-menu.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-scroll-header-panel/paper-scroll-header-panel.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+<link rel="import" href="../paper-spinner/paper-spinner.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../paper-tabs/paper-tabs.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
+
+<!--
+An element providing Cloudstitch-powered Polymer templating (with Paper* and Iron*).
+
+Example:
+
+    <breaking-news-feed></breaking-news-feed>
+
+@group Cloudstitch
+@element breaking-news-feed
+@demo demo/index.html
+-->
+<dom-module id="breaking-news-feed">
+  <style>
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+    paper-scroll-header-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: var(--paper-grey-200, #eee);
+      /* background for toolbar when it is at its full size */
+        --paper-scroll-header-panel-full-header: {
+        background: url(http://static.cloudstitch.io/img/promotions/espn-grass.png) no-repeat;
+        background-position: center; 
+        background-size: cover;
+      };
+
+      /* background for toolbar when it is condensed */
+      --paper-scroll-header-panel-condensed-header: {
+        background-color: transparent;
+      };
+    }
+    paper-toolbar {
+      background-color: transparent;
+    }
+    .content {
+      padding: 8px;
+    }
+    .filter-bar {
+      vertical-align: bottom;
+      width: 100%;
+    }
+    .filter-bar > * {
+      width: 50%;
+      bottom: 0;
+      margin: 0;
+    }
+
+    .addFab {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+    }
+    .collapseFab {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;      
+    }
+
+    input.file {
+      position: relative;
+      text-align: right;
+      -moz-opacity:0 ;
+      filter:alpha(opacity: 0);
+      opacity: 0;
+      z-index: 2;
+    }
+
+    paper-dropdown-menu {
+      margin-bottom: -15px;
+    }
+
+
+   .breaking-news-feed {
+        font-size: 14px;
+      }
+
+      .breaking-news-feed ol {
+        display: block;
+        list-style-type: none;
+        -webkit-margin-before: 1em;
+        -webkit-margin-after: 1em;
+        -webkit-margin-start: 0px;
+        -webkit-margin-end: 0px;
+        -webkit-padding-start: 40px;
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        display: block;
+        padding-left: 10px;
+        margin: 10px 20px 10px 20px;
+      }
+
+      li .body {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        color: #222222;
+      }
+
+      li .body h4 {
+        font-size: 1.4em;
+        margin-bottom: 0;
+        margin-top: 0;
+      }
+
+      li .body p {
+        margin: 0;
+        padding: 0;
+      }
+
+      li .footer {
+        color: #666;
+      }
+
+      .details {
+        color: #444;
+      }
+
+    .event-card {
+      padding: 5px 0 20px 0;
+      width: 80%;
+      min-width: 400px;
+      max-width: 800px;
+      margin: 10px auto 10px auto;
+      display: block;
+      --paper-card-header-color: var(--paper-red-500);  
+    }
+
+    paper-fab {
+      --paper-fab-background: var(--paper-red-500);
+    }
+  .search-input {
+    /* Label and underline color when the input is not focused */
+    --paper-input-container-color: white;
+
+    /* Label and underline color when the input is focused */
+    --paper-input-container-focus-color: white;
+
+    /* Label and underline color when the input is invalid */
+    --paper-input-container-invalid-color: white;
+
+    /* Input foreground color */
+    --paper-input-container-input-color: white;
+  }
+  </style>
+  <template>
+    <cloudstitch-box 
+      id="box" 
+      user="{{user}}" 
+      app="{{app}}" 
+      label="{{label}}" 
+      projection="items" 
+      data="{{sheetdata}}"
+      on-ready-for-render="render"
+      for-web-component></cloudstitch-box>
+
+    <paper-scroll-header-panel>
+      <paper-toolbar class="medium-tall">
+        <iron-image style="width:405px; height:46px; margin-left: auto; margin-right: auto; " sizing="contain" src="http://static.cloudstitch.io/img/promotions/espn-daily-field-report.png"></iron-image>
+        <!-- <h2>{{Settings.0.FeedTitle}}</h2> -->
+
+       <div class="filter-bar bottom horizontal layout">
+
+          <paper-input class="search-input short" label="Search" id="searchInput" value="{{freeSearch}}">
+          </paper-input>
+
+          <paper-dropdown-menu label="Game" on-iron-select="onEventSelect" class="search-input" style="inline-block">
+            <paper-menu class="dropdown-content">
+              <template is="dom-repeat" items="{{events}}">
+                <paper-item>{{item}}</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
+
+       </div>
+
+      </paper-toolbar>
+
+      <div class="content">
+        <paper-dialog id="addEntry" modal style="min-width: 400px; max-width: 600px; width: 80%; height: 80%;">
+          <h2>Submit Field Report</h2>
+          <form is="iron-form" id="newThingForm" method="post" action="{{formUrl}}">
+
+            <paper-dropdown-menu label="Game" name="Event" style="width:90%">
+              <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{events}}">
+                  <paper-item>{{item}}</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+
+            <paper-input label="Update" name="Update" /></paper-input>
+            <paper-input label="Reporter" name="ReporterName" /></paper-input>
+            <paper-textarea label="Details" name="AdditionalNotes" /></paper-textarea>
+
+            <!-- <input id="fileInput" type="file" class="file" name="Photo"> -->
+
+            <div class="buttons" style="position: absolute; bottom: 10px; right: 10px;">
+              <!-- <paper-button on-tap="selectFile" raised> -->
+                <!-- <iron-icon icon="editor:insert-photo"></iron-icon>Attach Photo -->
+              <!-- </paper-button raised> -->
+              <paper-button dialog-confirm autofocus on-tap="submitReport">Submit Report</paper-button>
+            </div>
+          </form>
+        </paper-dialog>
+
+        <div class="breaking-news-feed">
+          <template is="dom-repeat" items="{{results}}">
+            <paper-card  heading="{{item.name}}" class="event-card">
+              
+              <ol class="liveupdate-listing">
+                <template is="dom-repeat" items="{{item.feed}}">
+                  <li>
+                    <div class="body">                     
+                      <iron-image hidden$="{{collapsed}}" style="max-width:400px" hidden$="{{!item.Image}}" src="{{item.Image}}"></iron-image>
+                      <h4>{{item.Update}}</h4>
+                      <p hidden$="{{collapsed}}" class="details" style="">{{item.AdditionalNotes}}</p>
+                    </div>
+                    <div class="footer">
+                      <time-element timestr="{{item.Time}}"></time-element> 
+                      (<time-element timestr="{{item.Time}}" format="MMMM Do YYYY, h:mm:ss a"></time-element>)
+                      <span> / </span>
+                      <span class="author"><span class="author">{{item.ReporterName}}</span>              
+                    </div>
+                  </li>
+                </template>
+              </ol>
+            </paper-card>
+          </template>
+        </div>
+      </div>
+
+      <paper-fab class="addFab" icon="add" on-tap="onAddEntry"></paper-fab>
+      <paper-fab class="collapseFab" icon="{{collapseIcon}}" on-tap="toggleCollapse"></paper-fab>
+
+      <paper-toast id="successToast" text="Report Submitted!"></paper-toast>
+      <paper-toast id="errorToast" text="Update could not be submitted"></paper-toast>
+
+    </paper-scroll-header-panel>
+
+
+  </template>  
+  <script>
+    (function () {
+      var EVENT_COL = 'Event';
+      var UPDATE_COL = 'Update';
+      var DETAILS_COL = 'Details';
+      var REPORTER_COL = 'ReporterName';
+      var ALL_EVENTS = '(All)';
+      
+      Polymer({
+        is: 'breaking-news-feed',
+        properties: {
+          /**
+           * The Cloudstitch username.
+           */
+          user: {
+            type: String,
+            value: null
+          },
+
+          /**
+           * The Cloudstitch project name.
+           */
+          app: {
+            type: String,
+            value: null
+          },
+
+          /**
+           * The label of the Cloudstitch datasource.
+           */
+          label: {
+            type: String,
+            value: 'sheet'
+          },
+
+          /**
+           * The data for the template.
+           */
+          sheetdata: {
+            type: Object,
+            value: function() {
+              return null;
+            }
+          },
+          Feed: {
+            type: Array
+          },
+          results: {
+            type: Array,
+            computed: 'computeResults(Feed, freeSearch, eventRestrict)'
+          },
+          freeSearch: {
+            type: String,
+            value: ''
+          },
+          eventRestrict: {
+            type: String,
+            value: ALL_EVENTS
+          },
+          events: {
+            type: Array,
+            computed: 'computeEvents(Feed)'
+          },
+          collapsed: {
+            type: Boolean,
+            value: false
+          },
+          collapseIcon: {
+            type: String,
+            computed: 'computeCollapseIcon(collapsed)'
+          },
+          formUrl: {
+            type: String,
+            computed: 'computeFormUrl(user, app, label)'
+          }
+        },
+        toggleCollapse: function() {
+          this.collapsed = (! this.collapsed);
+        },
+        onEventSelect: function(e) {
+          this.eventRestrict = e.target.selectedItem.textContent.trim();
+        },
+        onAddEntry: function() {
+          this.$.addEntry.open();
+        },
+        selectFile: function() {
+          this.$.fileInput.click();
+        },
+        render: function() {
+          for (var key in this.$.box.data) {
+            this.set(key, this.$.box.data[key]);
+          }
+        },
+        computeCollapseIcon: function(collapsed) {
+          if (collapsed) {
+            return "icons:unfold-more";
+          } else {
+            return "icons:unfold-less";
+          }
+        },
+        submitReport: function() {
+          var form = this.$.newThingForm;
+          form.submit();
+        },
+
+        ready: function() {
+          var form = this.$.newThingForm;
+          var self = this;
+          form.addEventListener('iron-form-presubmit', function() {
+            this.request.body.Time = moment().format();
+            for (var key in this.request.body) {
+              if (typeof this.request.body[key] == 'undefined') {
+                this.request.body[key] = '';
+              }
+            }
+          });
+          form.addEventListener('iron-form-response', function() {
+            // Clear form
+            self.$.successToast.open();
+          });
+          form.addEventListener('iron-form-error', function() {
+            self.$.errorToast.open();
+          });
+
+        },
+        computeResults: function(feed, freeSearch, eventRestrict) {
+          var seen = {};
+          for (var i = 0; i < feed.length; i++) {
+            var item = feed[i];
+            if (this._searchResult(item, freeSearch, eventRestrict)) {
+              if (typeof seen[feed[i][EVENT_COL]] == 'undefined') {
+                seen[feed[i][EVENT_COL]] = {
+                  name: feed[i][EVENT_COL],
+                  feed: [feed[i]]
+                };
+              } else {
+                seen[feed[i][EVENT_COL]].feed.push(feed[i]);
+              }              
+            }
+          }
+          
+          // Sort the list of teams that pass the restriction.
+          var teams = [];
+          for (var key in seen) {
+            teams.push(key);
+          }
+          teams.sort();
+          
+          // Create the sorted return array.
+          var ret = [];
+          for (var i = 0; i < teams.length; i++) {
+            ret.push(seen[teams[i]]);
+          }
+          return ret;
+        },
+        _searchResult: function(item, freeSearch, eventRestrict) {
+          console.log("event re", eventRestrict);
+          if (eventRestrict != ALL_EVENTS) {
+            if (item[EVENT_COL] != eventRestrict) {
+              return false;
+            } 
+          }
+          if (freeSearch.trim().length == 0) {
+            return true;
+          }
+          if (item[UPDATE_COL] && (item[UPDATE_COL].indexOf(freeSearch) >= 0)) {
+            return true;
+          }
+          if (item[EVENT_COL] && (item[EVENT_COL].indexOf(freeSearch) >= 0)) {
+            return true;
+          }
+          if (item[DETAILS_COL] && (item[DETAILS_COL].indexOf(freeSearch) >= 0)) {
+            return true;
+          }
+          if (item[REPORTER_COL] && (item[REPORTER_COL].indexOf(freeSearch) >= 0)) {
+            return true;
+          }
+          return false;
+        },
+        computeEvents: function(feed) {
+          var events = [ALL_EVENTS];
+          var seen = {};
+          for (var i = 0; i < feed.length; i++) {
+            if (feed[i][EVENT_COL].trim()) {
+              if (!(seen[feed[i][EVENT_COL]] == true)) {
+                seen[feed[i][EVENT_COL]] = true;
+                events.push(feed[i][EVENT_COL]);
+              }
+            }
+          }
+          events.sort();
+          return events;          
+        },
+        computeFormUrl: function(user, app, label) {
+          return 'http://api.cloudstitch.io/' + user + '/' + app + '/datasources/' + label + '/Feed';
+        }
+      });
+    })();
+  </script>
+</dom-module>
+  
