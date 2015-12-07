@@ -276,7 +276,7 @@ Example:
         </paper-dialog>
 
         <div class="breaking-news-feed">
-          <template is="dom-repeat" items="{{results}}">
+          <template id="resultList" is="dom-repeat" items="[[results]]">
             <paper-card  heading="{{item.name}}" class="event-card">
               
               <ol class="liveupdate-listing">
@@ -356,11 +356,12 @@ Example:
             }
           },
           Feed: {
-            type: Array
+            type: Array,
+            notify: true
           },
           results: {
             type: Array,
-            computed: 'computeResults(Feed, freeSearch, eventRestrict)'
+            computed: 'computeResults(Feed.*, freeSearch, eventRestrict)'
           },
           freeSearch: {
             type: String,
@@ -419,17 +420,27 @@ Example:
         ready: function() {
           var form = this.$.newThingForm;
           var self = this;
+          var thetime = moment().format();
+          var item = {};
+          
           form.addEventListener('iron-form-presubmit', function() {
-            this.request.body.Time = moment().format();
+            this.request.body.Time = thetime;
             for (var key in this.request.body) {
               if (typeof this.request.body[key] == 'undefined') {
                 this.request.body[key] = '';
               }
             }
+            form.item = this.request.body;
           });
+          
           form.addEventListener('iron-form-response', function() {
             // Clear form
+            // Add the item. We only care about the item item now since
+            // The prorotype constraint is that you're adding to an existing game.
+            self.push('Feed',form.item);
+            self.$.resultList.render();
             self.$.successToast.open();
+            debugger;
           });
           form.addEventListener('iron-form-error', function() {
             self.$.errorToast.open();
@@ -438,6 +449,7 @@ Example:
         },
         computeResults: function(feed, freeSearch, eventRestrict) {
           var seen = {};
+          feed = feed.base;
           for (var i = 0; i < feed.length; i++) {
             var item = feed[i];
             if (this._searchResult(item, freeSearch, eventRestrict)) {
