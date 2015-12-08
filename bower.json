@@ -1,5 +1,5 @@
 {
-  "name": "breaking-news-feed",
+  "name": "cloudstitch-breaking-news-feed",
   "version": "1.0.4",
   "authors": [
     "Anonymous <ted@cloudstitch.com>"
@@ -10,9 +10,9 @@
     "polymer",
     "cloudstitch"
   ],
-  "main": "breaking-news-feed.html",
+  "main": "cloudstitch-breaking-news-feed.html",
   "license": "BSD",
-  "homepage": "https://github.com/CloudstitchWebComponents/breaking-news-feed/",
+  "homepage": "https://github.com/CloudstitchWebComponents/cloudstitch-breaking-news-feed/",
   "ignore": [
     "/.*",
     "/test/"

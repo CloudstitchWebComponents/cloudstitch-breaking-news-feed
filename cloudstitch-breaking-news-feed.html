@@ -68,13 +68,13 @@ An element providing Cloudstitch-powered Polymer templating (with Paper* and Iro
 
 Example:
 
-    <breaking-news-feed></breaking-news-feed>
+    <cloudstitch-breaking-news-feed></breaking-news-feed>
 
 @group Cloudstitch
 @element breaking-news-feed
 @demo demo/index.html
 -->
-<dom-module id="breaking-news-feed">
+<dom-module id="cloudstitch-breaking-news-feed">
   <style>
     :host {
       display: block;
@@ -187,12 +187,15 @@ Example:
         color: #444;
       }
 
-    .event-card {
-      padding: 5px 0 20px 0;
+    .centered-narrow {
       width: 80%;
       min-width: 400px;
       max-width: 800px;
       margin: 10px auto 10px auto;
+    }
+
+    .event-card {
+      padding: 5px 0 20px 0;
       display: block;
       --paper-card-header-color: var(--paper-red-500);  
     }
@@ -213,6 +216,37 @@ Example:
     /* Input foreground color */
     --paper-input-container-input-color: white;
   }
+
+ .search-box {
+      background-color: #fff;
+      border: 1px solid #eee;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+      height: 40px;
+    }
+    .search-box iron-icon {
+      color: var(--google-grey-700);
+      fill: var(--google-grey-700);
+      margin: 0 8px;
+    }
+    
+    .search-box input {
+      font-size: 20px;
+      outline: 0;
+      border: none;
+    }
+    .content {
+      padding: 8px;
+    }
+    .search-box {
+      @apply(--layout-flex);
+      @apply(--layout-center);
+      @apply(--layout-horizontal);
+    }
+    .search-box input {
+      @apply(--layout-flex);
+    }
+
+
   </style>
   <template>
     <cloudstitch-box 
@@ -230,12 +264,9 @@ Example:
         <iron-image style="width:405px; height:46px; margin-left: auto; margin-right: auto; " sizing="contain" src="http://static.cloudstitch.io/img/promotions/espn-daily-field-report.png"></iron-image>
         <!-- <h2>{{Settings.0.FeedTitle}}</h2> -->
 
-       <div class="filter-bar bottom horizontal layout">
+       <div class="filter-bar bottom">
 
-          <paper-input class="search-input short" label="Search" id="searchInput" value="{{freeSearch}}">
-          </paper-input>
-
-          <paper-dropdown-menu label="Game" on-iron-select="onEventSelect" class="search-input" style="inline-block">
+          <paper-dropdown-menu label="Game" on-iron-select="onEventSelect" class="centered-narrow search-input" style="display:block;margin-left:auto;margin-right:auto;width:auto;">
             <paper-menu class="dropdown-content">
               <template is="dom-repeat" items="{{events}}">
                 <paper-item>{{item}}</paper-item>
@@ -248,6 +279,7 @@ Example:
       </paper-toolbar>
 
       <div class="content">
+
         <paper-dialog id="addEntry" modal style="min-width: 400px; max-width: 600px; width: 80%; height: 80%;">
           <h2>Submit Field Report</h2>
           <form is="iron-form" id="newThingForm" method="post" action="{{formUrl}}">
@@ -260,9 +292,9 @@ Example:
               </paper-menu>
             </paper-dropdown-menu>
 
-            <paper-input label="Update" name="Update" /></paper-input>
-            <paper-input label="Reporter" name="ReporterName" /></paper-input>
-            <paper-textarea label="Details" name="AdditionalNotes" /></paper-textarea>
+            <paper-input id="UpdateInput" label="Update" name="Update" /></paper-input>
+            <paper-input id="ReporterInput" label="Reporter" name="ReporterName" /></paper-input>
+            <paper-textarea id="DetailsInput" label="Details" name="AdditionalNotes" /></paper-textarea>
 
             <!-- <input id="fileInput" type="file" class="file" name="Photo"> -->
 
@@ -276,8 +308,14 @@ Example:
         </paper-dialog>
 
         <div class="breaking-news-feed">
+
+          <div class="search-box bottom centered-narrow">
+            <iron-icon icon="search"></iron-icon>
+            <input value="{{freeSearch::input}}">
+          </div>
+
           <template id="resultList" is="dom-repeat" items="[[results]]">
-            <paper-card  heading="{{item.name}}" class="event-card">
+            <paper-card  heading="{{item.name}}" class="event-card centered-narrow">
               
               <ol class="liveupdate-listing">
                 <template is="dom-repeat" items="{{item.feed}}">
@@ -287,7 +325,7 @@ Example:
                       <h4>{{item.Update}}</h4>
                       <p hidden$="{{collapsed}}" class="details" style="">{{item.AdditionalNotes}}</p>
                     </div>
-                    <div class="footer">
+                    <div class="footer" hidden$="{{collapsed}}">
                       <time-element timestr="{{item.Time}}"></time-element> 
                       (<time-element timestr="{{item.Time}}" format="MMMM Do YYYY, h:mm:ss a"></time-element>)
                       <span> / </span>
@@ -320,7 +358,7 @@ Example:
       var ALL_EVENTS = '(All)';
       
       Polymer({
-        is: 'breaking-news-feed',
+        is: 'cloudstitch-breaking-news-feed',
         properties: {
           /**
            * The Cloudstitch username.
@@ -420,7 +458,7 @@ Example:
         ready: function() {
           var form = this.$.newThingForm;
           var self = this;
-          var thetime = moment().format();
+          var thetime = moment().format("MM/DD/YYYY HH:mm:ss");
           var item = {};
           
           form.addEventListener('iron-form-presubmit', function() {
@@ -440,7 +478,8 @@ Example:
             self.push('Feed',form.item);
             self.$.resultList.render();
             self.$.successToast.open();
-            debugger;
+            self.$.DetailsInput.value = '';
+            self.$.UpdateInput.value = '';            
           });
           form.addEventListener('iron-form-error', function() {
             self.$.errorToast.open();
@@ -479,7 +518,6 @@ Example:
           return ret;
         },
         _searchResult: function(item, freeSearch, eventRestrict) {
-          console.log("event re", eventRestrict);
           if (eventRestrict != ALL_EVENTS) {
             if (item[EVENT_COL] != eventRestrict) {
               return false;

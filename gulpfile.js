@@ -25,6 +25,7 @@ var options = minimist(process.argv.slice(2), knownOptions);
 gulp.task('copy', function () {
   var app = gulp.src([
     '*.html',
+    'moment.min.js'
   ], {
     dot: true
   }).pipe(gulp.dest('dist/elements'));
@@ -33,8 +34,8 @@ gulp.task('copy', function () {
     'bower_components/**/*'
   ]).pipe(gulp.dest('dist'));
 
-  var vulcanized = gulp.src(['cloudstitch-polymer.html'])
-    .pipe($.rename('cloudstitch-polymer.vulcanized.html'))
+  var vulcanized = gulp.src(['cloudstitch-breaking-news-feed.html'])
+    .pipe($.rename('cloudstitch-breaking-news-feed.vulcanized.html'))
     .pipe(gulp.dest('dist/elements'));
 });
 
@@ -43,7 +44,7 @@ gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 // Vulcanize imports
 gulp.task('vulcanize', function () {
   var DEST_DIR = '.';
-  return gulp.src('dist/elements/cloudstitch-polymer.vulcanized.html')
+  return gulp.src('dist/elements/cloudstitch-breaking-news-feed.vulcanized.html')
     .pipe($.vulcanize({
       stripComments: true,
       inlineCss: true,
@@ -73,7 +74,7 @@ gulp.task('deploy:remote', function() {
       Bucket: 'components.cloudstitch.com', //  Required
       ACL:    'public-read',
       keyTransform: function(relative_filename) {
-        var fname = 'elements/' + location + '/cloudstitch-polymer/' + relative_filename;
+        var fname = 'elements/' + location + '/cloudstitch-breaking-news-feed/' + relative_filename;
         console.log(fname);
         return fname;
       }

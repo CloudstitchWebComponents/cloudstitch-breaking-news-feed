@@ -1,4 +1,4 @@
-<script src="moment.js.min"></script>
+<script src="moment.min.js"></script>
 
 <link rel="import" href="../polymer/polymer.html">
 
@@ -45,7 +45,6 @@ Example:
           }
         },
         makeTime: function(timestr) {
-          console.log(this.format);
           if (this.format == 'fromNow') {
             return moment(timestr).fromNow();
           } else {
