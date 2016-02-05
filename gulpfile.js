@@ -2,6 +2,9 @@
 
 // Include Gulp & Tools We'll Use
 var gulp = require('gulp');
+var bower_package = require('./bower.json');
+require('../utils/gulp-master')(gulp, bower_package);
+
 var $ = require('gulp-load-plugins')();
 var del = require('del');
 var runSequence = require('run-sequence');
@@ -39,7 +42,6 @@ gulp.task('copy', function () {
     .pipe(gulp.dest('dist/elements'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
 // Vulcanize imports
 gulp.task('vulcanize', function () {
@@ -52,33 +54,6 @@ gulp.task('vulcanize', function () {
     }))
     .pipe(gulp.dest('dist/elements'))
     .pipe($.size({title: 'vulcanize'}));
-});
-
-gulp.task('deploy:remote', function() {
-  var location = 'current';
-  if (options.version) {
-    location = options.version;
-  }
-  var s3 = require('gulp-s3-upload')({
-    region: 'us-west-2'
-  });
-  return gulp.src(
-        [
-            'dist/elements/*vulcanized*'
-        ],
-        {
-            base: 'dist/elements'
-        }
-  )
-  .pipe(s3({
-      Bucket: 'components.cloudstitch.com', //  Required
-      ACL:    'public-read',
-      keyTransform: function(relative_filename) {
-        var fname = 'elements/' + location + '/cloudstitch-breaking-news-feed/' + relative_filename;
-        console.log(fname);
-        return fname;
-      }
-  }));
 });
 
 // Build Production Files, the Default Task
